@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {call, put} from 'redux-saga/effects';
+import { CommonActions } from '@react-navigation/native';
 
 const url = `https://fluxjwt-app.herokuapp.com/api/`
 
@@ -29,16 +30,21 @@ export function* userLoginAsync(action) {
 const userRegister = (details) => {
     return axios.post(`${url}security/registration`, details)
         .then(response => {
-            console.log(response.data.username)
+            console.log(response.data)
             return response.data
-        });
+        })
+        .catch(error => console.log(error));
+}
+
+const goToSignIn = (navigation)=>{
+    navigation.navigate('Sign In');
 }
 
 export function* userRegisterAsync(action) {
     try {
-        console.log('123');
+        console.log(action);
         const response = yield call(userRegister, action.details);
-        console.log('user register details');
+        console.log('user register details' + response.id, response.username);
         yield put({
             type: "USER_REGISTER",
             payload: {
