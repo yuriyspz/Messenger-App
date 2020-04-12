@@ -8,7 +8,7 @@ const fieldComponent = ({ input: { onChange, ...input }, ...rest}) => (
 );
 const InputWrap = styled.View`
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     position: relative;
 `;
 const CustomInput = styled.TextInput`
