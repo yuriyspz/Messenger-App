@@ -1,6 +1,8 @@
 import axios from 'axios'
 import {call, put} from 'redux-saga/effects';
-import { CommonActions } from '@react-navigation/native';
+import {navigate} from '../App'
+import {takeEvery, all} from "redux-saga/effects";
+import {userLoginAction, userRegisterAction} from "../actions";
 
 const url = `https://fluxjwt-app.herokuapp.com/api/`
 
@@ -12,15 +14,9 @@ const userLogin = (username, password) => {
 
 export function* userLoginAsync(action) {
     try {
-
         const response = yield call(userLogin, action.username, action.password);
         console.log(response);
-        yield put({
-            type: 'USER_LOGIN',
-            payload: {
-                token: response.token,
-            }
-        });
+        yield put(userLoginAction(response.token));
     } catch (error) {
         return console.log(error);
     }
@@ -31,13 +27,10 @@ const userRegister = (details) => {
     return axios.post(`${url}security/registration`, details)
         .then(response => {
             console.log(response.data)
+            navigate('Sign In');
             return response.data
         })
         .catch(error => console.log(error));
-}
-
-const goToSignIn = (navigation)=>{
-    navigation.navigate('Sign In');
 }
 
 export function* userRegisterAsync(action) {
@@ -45,14 +38,23 @@ export function* userRegisterAsync(action) {
         console.log(action);
         const response = yield call(userRegister, action.details);
         console.log('user register details' + response.id, response.username);
-        yield put({
-            type: "USER_REGISTER",
-            payload: {
-                username: response.username,
-                id: response.id
-            }
-        });
+        yield put(userRegisterAction(response.id, response.username));
     } catch (error) {
         return console.log(error);
     }
+}
+
+
+function* watchUserLogin() {
+    yield takeEvery('USER_LOGIN_ATTEMPT', userLoginAsync);
+}
+function* watchUserRegister() {
+    yield takeEvery('USER_REGISTER_ATTEMPT', userRegisterAsync);
+}
+
+export default function* rootSaga() {
+    yield all([
+        watchUserLogin(),
+        watchUserRegister(),
+    ])
 }
