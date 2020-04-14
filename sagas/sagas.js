@@ -1,36 +1,14 @@
 import axios from 'axios'
-import {call, put} from 'redux-saga/effects';
+import {getPostsAction, userLoginAction, userRegisterAction} from "../actions";
+import {all, call, put, takeEvery} from 'redux-saga/effects';
 import {navigate} from '../App'
-import {takeEvery, all} from "redux-saga/effects";
-import {userLoginAction, userRegisterAction} from "../actions";
+import {AsyncStorage} from "react-native";
 
 const url = `https://fluxjwt-app.herokuapp.com/api/`
 
-//Sign in
-const userLogin = (username, password) => {
-    return axios.post(`${url}security/login`, {username, password})
-        .then(response => response.data);
-}
-
-export function* userLoginAsync(action) {
-    try {
-        const response = yield call(userLogin, action.username, action.password);
-        console.log(response);
-        yield put(userLoginAction(response.token));
-    } catch (error) {
-        return console.log(error);
-    }
-}
-
 // Register
-const userRegister = (details) => {
-    return axios.post(`${url}security/registration`, details)
-        .then(response => {
-            console.log(response.data)
-            navigate('Sign In');
-            return response.data
-        })
-        .catch(error => console.log(error));
+function* watchUserRegister() {
+    yield takeEvery('USER_REGISTER_ATTEMPT', userRegisterAsync);
 }
 
 export function* userRegisterAsync(action) {
@@ -44,17 +22,77 @@ export function* userRegisterAsync(action) {
     }
 }
 
+const userRegister = (details) => {
+    return axios.post(`${url}security/registration`, details)
+        .then(response => {
+            navigate('Sign In');
+            return response.data
+        })
+        .catch(error => console.log(error));
+}
 
+//Sign in
 function* watchUserLogin() {
     yield takeEvery('USER_LOGIN_ATTEMPT', userLoginAsync);
 }
-function* watchUserRegister() {
-    yield takeEvery('USER_REGISTER_ATTEMPT', userRegisterAsync);
+
+export function* userLoginAsync(action) {
+    try {
+        const response = yield call(userLogin, action.username, action.password);
+        console.log(response);
+        yield put(userLoginAction(response.token));
+    } catch (error) {
+        return console.log(error);
+    }
+}
+
+const userLogin = (username, password) => {
+    return axios.post(`${url}security/login`, {username, password})
+        .then(response => {
+            AsyncStorage.setItem('userToken', response.data.token);
+            navigate('Posts')
+            return response.data
+        })
+}
+
+//Get posts
+function* watchPostsRender() {
+    yield takeEvery('GET_POSTS_ATTEMPT', getPostsAsync);
+}
+
+export function* getPostsAsync() {
+    let message = [];
+    try {
+        AsyncStorage.getItem('userToken', (err, result) => result).then(token =>{
+            message = getPosts(token);
+        })
+        //const response = yield call(getPosts, token);
+        yield put(getPostsAction(message));
+    } catch (error) {
+        return console.log(error);
+    }
+}
+
+const getPosts = (token) => {
+    console.log(token);
+    return axios.get(`${url}message`, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        }
+    })
+        .then(response => {
+            console.log(response.data)
+            return response.data
+        })
+        .catch(error => console.log(error));
 }
 
 export default function* rootSaga() {
     yield all([
         watchUserLogin(),
         watchUserRegister(),
+        watchPostsRender(),
     ])
 }

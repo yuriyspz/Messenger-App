@@ -4,5 +4,9 @@ export const userLoginAction = (payload) => ({
 });
 export const userRegisterAction = (payload) => ({
     type: 'USER_REGISTER',
-    payload,
+    payload: payload,
+});
+export const getPostsAction = (payload) => ({
+    type: 'GET_POSTS',
+    payload: payload,
 });
