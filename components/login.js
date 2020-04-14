@@ -21,7 +21,6 @@ class Login extends React.Component {
 
         return (
             <Wrapper>
-                {/*<LoginHeading>Sign In</LoginHeading>*/}
                 <Field
                     name='username'
                     type='text'
@@ -53,7 +52,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default reduxForm({
-    form: "loginForm"
+    form: "loginForm",
 })(
     connect(
         null,

@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {TouchableOpacity} from "react-native";
 import styled from "styled-components/native";
 import fieldComponent from "./fieldComponent";
+import validate from "./validation";
 
 class Register extends React.Component {
 
@@ -51,7 +52,8 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default reduxForm({
-    form: "registerForm"
+    form: "registerForm",
+    validate,
 })(
     connect(
         null,
