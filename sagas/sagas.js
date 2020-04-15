@@ -61,13 +61,11 @@ function* watchPostsRender() {
 }
 
 export function* getPostsAsync() {
-    let message = [];
     try {
-        AsyncStorage.getItem('userToken', (err, result) => result).then(token =>{
-            message = getPosts(token);
-        })
-        //const response = yield call(getPosts, token);
-        yield put(getPostsAction(message));
+        const token = yield AsyncStorage.getItem('userToken')
+        const response = yield call(getPosts, token);
+        console.log(response)
+        yield put(getPostsAction(response));
     } catch (error) {
         return console.log(error);
     }
