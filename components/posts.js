@@ -9,10 +9,11 @@ class Posts extends React.Component {
         super(props);
     }
     componentDidMount() {
+        console.log('posts-------'+this.props.posts)
         this.props.getPosts();
     }
     render() {
-        console.log(this.props.posts)
+
         return (
 
             <View>
@@ -30,6 +31,7 @@ class Posts extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+    console.log(state.posts);
     return {
         posts: state.posts
     }
