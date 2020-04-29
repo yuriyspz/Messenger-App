@@ -11,6 +11,7 @@ import rootSaga from "./sagas/sagas";
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from "@react-navigation/stack";
 import { composeWithDevTools } from 'redux-devtools-extension';
+import SinglePost from "./components/singlePost";
 
 
 export function navigate(name, params) {
@@ -28,6 +29,7 @@ const store = createStore(
 );
 sagaMiddleware.run(rootSaga);
 
+
 export default function App() {
     return (
         <Provider store={store}>
@@ -36,6 +38,7 @@ export default function App() {
                     <Stack.Screen name="Sign In" component={Login}/>
                     <Stack.Screen name="Sign Up" component={Register}/>
                     <Stack.Screen name="Posts" component={Posts}/>
+                    <Stack.Screen name="Post" component={SinglePost}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </Provider>
